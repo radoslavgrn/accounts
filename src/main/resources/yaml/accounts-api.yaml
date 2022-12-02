@@ -1,0 +1,231 @@
+openapi: 3.0.3
+info:
+  title: User accounts management - OpenAPI 3.0
+  description: |-
+    Simple web application for management of user accounts.
+  termsOfService: https://swagger.io/terms/
+  contact:
+    email: radoslavgrn@gmail.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: https://swagger.io
+servers:
+  - url: https://user-accounts.swagger.io/api/v1
+tags:
+  - name: account
+    description: User account operations
+    externalDocs:
+      description: Find out more
+      url: https://swagger.io
+paths:
+  /accounts:
+    post:
+      tags:
+        - account
+      summary: Add a new account to the database
+      description: Add a new account to the database
+      operationId: addAccount
+      requestBody:
+        description: Create a new account
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountCreateDto'
+      responses:
+        '201':
+          description: Successfully created resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - basicAuth: [ ]
+
+    get:
+      tags:
+        - account
+      summary: Get accounts
+      description: Get all accounts
+      operationId: getAccounts
+      responses:
+        '200':
+          description: Successfully retrieved resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - basicAuth: [ ]
+
+
+  /accounts/{id}:
+    patch:
+      tags:
+        - account
+      summary: Edit an account
+      description: Edit an existing account
+      operationId: editAccount
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Numeric id of the account
+      requestBody:
+        description: Edit an account
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountCreateDto'
+      responses:
+        '200':
+          description: Successfully edited resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - basicAuth: [ ]
+
+    delete:
+      tags:
+        - account
+      summary: Delete an account
+      description: Delete an existing account
+      operationId: deleteAccount
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Numeric id of the account
+      responses:
+        '200':
+          description: Successfully deleted resource
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - basicAuth: [ ]
+
+
+components:
+  schemas:
+    AccountCreateDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: First name of the account
+          example: Ryan
+        lastName:
+          type: string
+          description: Last name of the account
+          example: Jacobs
+        email:
+          type: string
+          description: Email of the account
+          example: ryan.jacobs@mail.us
+        dateOfBirth:
+          type: string
+          description: Date of birth
+          format: date-time
+
+    AccountDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+          readOnly: true
+        firstName:
+          type: string
+          description: First name of the account
+          example: Ryan
+        lastName:
+          type: string
+          description: Last name of the account
+          example: Jacobs
+        email:
+          type: string
+          description: Email of the account
+          example: ryan.jacobs@mail.us
+          format: email
+        dateOfBirth:
+          type: string
+          description: Date of birth
+          format: date-time
+    ApiError:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Http code of the error
+        message:
+          type: string
+          description: Description of the error
+
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+
+  responses:
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Error:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
+
+
+  requestBodies:
+    AccountCreateDto:
+      description: Account object for creation of new one
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccountCreateDto'
+
